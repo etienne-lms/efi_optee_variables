@@ -1,0 +1,32 @@
+From 03a3056cbb33b6c3415c5e27adb207c8f86507a7 Mon Sep 17 00:00:00 2001
+From: Etienne Carriere <etienne.carriere@linaro.org>
+Date: Thu, 12 Nov 2020 12:18:36 +0100
+Subject: [PATCH] efi: efi_loader: fix size of buffer size into in optee mm
+ communication
+
+Fix the buffer size sent to the UEFI StandaloneMM image is defined as a
+64bit value, not a 32bit. The issue raised when enabling OP-TEE StMM
+communication on 32bit machines as size_t is a 32bit value for such
+architectures.
+
+Signed-off-by: Etienne Carriere <etienne.carriere@linaro.org>
+---
+ lib/efi_loader/efi_variable_tee.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/efi_loader/efi_variable_tee.c b/lib/efi_loader/efi_variable_tee.c
+index be6f3dfad4..067b760bd1 100644
+--- a/lib/efi_loader/efi_variable_tee.c
++++ b/lib/efi_loader/efi_variable_tee.c
+@@ -75,7 +75,7 @@ static efi_status_t optee_mm_communicate(void *comm_buf, ulong dsize)
+ 		return EFI_INVALID_PARAMETER;
+ 
+ 	mm_hdr = (struct efi_mm_communicate_header *)comm_buf;
+-	buf_size = mm_hdr->message_len + sizeof(efi_guid_t) + sizeof(size_t);
++	buf_size = mm_hdr->message_len + sizeof(efi_guid_t) + sizeof(uint64_t);
+ 
+ 	if (dsize != buf_size)
+ 		return EFI_INVALID_PARAMETER;
+-- 
+2.17.1
+
