@@ -12,11 +12,7 @@ exit_usage() {
 if [ "$1" == "--clone" ]; then
 
 	#[ ! -d 'u-boot' ] && git clone https://gitlab.denx.de/u-boot/custodians/u-boot-efi -b efi-2020-10 && mv u-boot-efi u-boot 
-	[ ! -d 'u-boot' ] && { \
-		git clone https://github.com/u-boot/u-boot.git -b master; \
-		patch -d u-boot -p1 < patches/0001-efi-efi_loader-fix-size-of-buffer-size-into-in-optee.patch; \
-		patch -d u-boot -p1 < patches/0002-rpmb-emulation-hack.-Breaks-proper-hardware-support.patch; \
-	}
+	[ ! -d 'u-boot' ] && git clone https://github.com/u-boot/u-boot.git -b master
 
 	#[ ! -d 'edk2-platforms' ] && git clone https://git.linaro.org/people/sughosh.ganu/edk2-platforms.git -b ffa_svc_optional_on_upstream
 	#[ ! -d 'edk2-platforms' ] && git clone https://git.linaro.org/people/ilias.apalodimas/edk2-platforms.git -b stmm_rpmb_ffa
@@ -43,6 +39,11 @@ if [ "$1" == "--clone" ]; then
 		git pull --rebase
 		popd
 	done
+
+	# Some late U-boot patching
+	patch -d u-boot -p1 < patches/0001-efi-efi_loader-fix-size-of-buffer-size-into-in-optee.patch
+	patch -d u-boot -p1 < patches/0002-rpmb-emulation-hack.-Breaks-proper-hardware-support.patch
+	patch -d u-boot -p1 < patches/0003-configs-qemu_tfa_mm32-UEFI-StMM-in-32bit-OP-TEE.patch
 else
 	for i in u-boot edk2 edk2-platforms optee_os; do
 		[ -d $i ] || { echo No $i repository. Run './build-32b.sh --clone' fisrt, aborting...; exit 1; }
@@ -76,8 +77,7 @@ export CROSS_COMPILE=arm-linux-gnueabihf-
 export ARCH=arm
 
 pushd u-boot
-#make qemu_tfa_mm_32b_defconfig
-make qemu_arm_optee_defconfig
+make qemu_tfa_mm32_defconfig
 make -j$(nproc)
 popd
 
