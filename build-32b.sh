@@ -43,7 +43,7 @@ if [ "$1" == "--clone" ]; then
 	done
 else
 	for i in u-boot edk2 edk2-platforms optee_os; do
-		[ -d $i ] || { echo No $i repository, abort.; exit 1; }
+		[ -d $i ] || { echo No $i repository. Run './build-32b.sh --clone' fisrt, aborting...; exit 1; }
 	done
 fi
 
