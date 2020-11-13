@@ -30,7 +30,9 @@ if [ "$1" == "--clone" ]; then
 	git submodule update --init --recursive
 	popd
 
-	[ ! -d 'optee_os' ] && git clone https://github.com/OP-TEE/optee_os.git -b stmm-arm-32b
+	# Patch in OP-TEE under review: use etienne-lms until then
+	#[ ! -d 'optee_os' ] && git clone https://github.com/OP-TEE/optee_os.git -b stmm-arm-32b
+	[ ! -d 'optee_os' ] && git clone https://github.com/etienne-lms/optee_os.git -b stmm-arm-32b
 
 	[ ! -d 'arm-trusted-firmware' ] && git clone https://github.com/ARM-software/arm-trusted-firmware.git -b master
 
