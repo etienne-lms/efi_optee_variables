@@ -13,6 +13,7 @@ if [ "$1" == "--clone" ]; then
 
 	#[ ! -d 'u-boot' ] && git clone https://gitlab.denx.de/u-boot/custodians/u-boot-efi -b efi-2020-10 && mv u-boot-efi u-boot 
 	[ ! -d 'u-boot' ] && git clone https://github.com/u-boot/u-boot.git -b master
+	# Note: patches applied later, from RPMB emulation
 
 	#[ ! -d 'edk2-platforms' ] && git clone https://git.linaro.org/people/sughosh.ganu/edk2-platforms.git -b ffa_svc_optional_on_upstream
 	#[ ! -d 'edk2-platforms' ] && git clone https://git.linaro.org/people/ilias.apalodimas/edk2-platforms.git -b stmm_rpmb_ffa
@@ -27,8 +28,8 @@ if [ "$1" == "--clone" ]; then
 	popd
 
 	# Patch in OP-TEE under review: use etienne-lms until then
-	#[ ! -d 'optee_os' ] && git clone https://github.com/OP-TEE/optee_os.git -b stmm-arm-32b
-	[ ! -d 'optee_os' ] && git clone https://github.com/etienne-lms/optee_os.git -b stmm-arm-32b
+	[ ! -d 'optee_os' ] && git clone https://github.com/OP-TEE/optee_os.git -b stmm-arm-32b
+	#[ ! -d 'optee_os' ] && git clone https://github.com/etienne-lms/optee_os.git -b stmm-arm-32b
 
 	[ ! -d 'arm-trusted-firmware' ] && git clone https://github.com/ARM-software/arm-trusted-firmware.git -b master
 
@@ -55,6 +56,9 @@ export WORKSPACE=$(pwd)
 export PACKAGES_PATH=$WORKSPACE/edk2:$WORKSPACE/edk2-platforms
 export ACTIVE_PLATFORM="Platform/StMMRpmb/PlatformStandaloneMm.dsc"
 export GCC5_ARM_PREFIX=arm-linux-gnueabihf-
+
+printf "Test toolchain... "
+${GCC5_ARM_PREFIX}gcc -dumpversion || { echo Missing toolchain. Abort.; exit 1; }
 
 source edk2/edksetup.sh
 make -C edk2/BaseTools
